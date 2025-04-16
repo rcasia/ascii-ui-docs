@@ -56,7 +56,7 @@ const config: Config = {
       title: 'ascii-ui',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
       },
       items: [
         {
