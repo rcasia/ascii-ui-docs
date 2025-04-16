@@ -35,3 +35,22 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.ascii-title {
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1.2;
+  font-size: 1.81rem; /* ajustá según lo necesites */
+}
+
+/* Tema oscuro */
+[data-theme='dark'] .ascii-title {
+  color: var(--ifm-color-primary);           /* reutiliza #25c2a0 */
+  background-color: var(--ifm-background-color); /* usa el fondo definido del tema oscuro */
+}
+
+/* Tema claro */
+[data-theme='light'] .ascii-title {
+  color: var(--ifm-color-primary-darkest);   /* por ejemplo: #1a8870 */
+  background-color: #f4fefc;                 /* tono claro que no desentone */
+}
