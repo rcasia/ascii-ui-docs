@@ -1,6 +1,6 @@
 # Website
 
-<https://github.com/rcasia/ascii-ui-docs>
+<https://ricardocasia.com/ascii-ui-docs/>
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
