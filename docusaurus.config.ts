@@ -63,7 +63,7 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Get started',
         },
         {
           href: 'https://github.com/rcasia/ascii-ui',
@@ -79,7 +79,7 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Get Started',
               to: '/docs/intro',
             },
           ],
