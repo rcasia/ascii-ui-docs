@@ -125,7 +125,7 @@ setCount(count() + 1) -- Correct usage
 ## Related
 
 - [`useReducer`](./use_reducer): For managing complex state logic.
-- [`useEffect`](./use_ffect): For running side effects after state updates.
+- [`useEffect`](./use_effect): For running side effects after state updates.
 
 ---
 
