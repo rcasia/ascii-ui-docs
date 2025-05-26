@@ -86,17 +86,10 @@ local name, setName = useState("initial value")
 Call the setter function with the new value:
 
 ```lua
-setCount(count() + 1)
+-- can do this in two ways:
+setCount(count() + 1) -- either
+setCount(function(prev) return prev + 1 end) -- or 
 setName("new value")
-```
-
-### Functional Updates
-
-Unlike React's `useState`, the ascii-ui version does not have a built-in functional update form (like passing a function to setState). However, you can implement logic yourself if needed:
-
-```lua
-setCount(function(prev) return prev + 1 end) -- Not supported directly
-setCount(count() + 1) -- Correct usage
 ```
 
 ---
@@ -109,7 +102,7 @@ setCount(count() + 1) -- Correct usage
 | Get current value  | Call getter: `count()`        | Use variable: `count`                       |
 | Set value          | Call setter: `setCount(val)`  | Call setter: `setCount(val)`                |
 | Triggers rerender  | Yes                           | Yes                                         |
-| Functional updates | Not built-in                  | Built-in: `setCount(prev => prev + 1)`      |
+| Functional updates | Built-in: `setCount(function(prev) return prev + 1 end)`                 | Built-in: `setCount(prev => prev + 1)`      |
 
 ---
 
