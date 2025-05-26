@@ -49,7 +49,8 @@ useEffect(effectFn [, observedValues])
 Run a function after the component renders:
 
 ```lua
-local useEffect = require("ascii-ui.hooks.use_effect")
+local ui = require("ascii-ui")
+local useEffect = ui.hooks.useEffect
 
 useEffect(function()
   print("Component mounted or rendered!")
@@ -61,8 +62,9 @@ end)
 Run a function only when certain state changes:
 
 ```lua
-local useState = require("ascii-ui.hooks.use_state")
-local useEffect = require("ascii-ui.hooks.use_effect")
+local ui = require("ascii-ui")
+local useEffect = ui.hooks.useEffect
+local useState = ui.hooks.useState
 
 local name, setName = useState("ascii-ui")
 

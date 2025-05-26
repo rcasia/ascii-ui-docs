@@ -63,7 +63,8 @@ The `action` object is typically structured as a table, e.g. `{ type = "incremen
 ### Basic Example
 
 ```lua
-local useReducer = require("ascii-ui.hooks.use_reducer")
+local ui = require("ascii-ui")
+local useReducer = ui.hooks.useReducer
 
 -- Reducer function
 local function counterReducer(state, action)
