@@ -15,7 +15,7 @@ function HomepageHeader() {
       <div className="container">
         <Heading as="h1" className="hero__title ascii-title" >
           <span aria-label="ASCII UI homepage">
-          {`
+            {`
  ▗▄▖  ▗▄▄▖ ▗▄▄▖▗▄▄▄▖▗▄▄▄▖    ▗▖ ▗▖▗▄▄▄▖
 ▐▌ ▐▌▐▌   ▐▌     █    █      ▐▌ ▐▌  █  
 ▐▛▀▜▌ ▝▀▚▖▐▌     █    █      ▐▌ ▐▌  █  
@@ -28,7 +28,7 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro">
+            to="/docs/get-started">
             Get Started
           </Link>
         </div>
