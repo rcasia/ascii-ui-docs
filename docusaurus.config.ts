@@ -66,7 +66,7 @@ const config: Config = {
           label: 'Get started',
         },
         {
-          href: 'https://github.com/rcasia/ascii-ui',
+          href: 'https://github.com/rcasia/ascii-ui.nvim',
           label: 'GitHub',
           position: 'right',
         },
