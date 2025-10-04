@@ -4,7 +4,7 @@ id: use-interval
 title: useInterval
 sidebar_label: useInterval
 description: Run a callback function at a specified interval inside ascii-ui components.
-tags: [api, hooks, interval, timer]
+tags: [api, hooks, effect, interval, timer]
 ---
 
 # useInterval
