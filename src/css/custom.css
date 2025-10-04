@@ -6,7 +6,6 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-font-family-base: monospace;
   --ifm-code-font-size: 95%;
   --ifm-color-primary: #2e8555;
   --ifm-color-primary-dark: #29784c;
