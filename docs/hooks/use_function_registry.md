@@ -1,104 +1,80 @@
 ---
-
 sidebar_position: 4
-sidebar_label: useFunctionRegistry
+id: use-function-registry
+title: useFunctionRegistry [experimental]
+sidebar_label: useFunctionRegistry [experimental]
+description: Register Lua functions in a global registry for later invocation within ascii-ui components.
+tags: [api, hooks, registry, callbacks, experimental]
 ---
 
-# `useFunctionRegistry` Hook
+# useFunctionRegistry [experimental]
 
-The `useFunctionRegistry` hook in **ascii-ui.nvim** allows you to register a Lua function and receive a reference string that can be used as a callback in declarative UI markup or passed as a prop to components that expect a function reference. This is especially useful in scenarios where your UI definition is dynamic (such as when using XML-like syntax) or where functions need to be referenced indirectly.
-
----
-
-## Overview
-
-`useFunctionRegistry` solves the problem of referring to functions in a declarative UI context where you may not be able to directly pass a Lua function as a prop (for example, when using string-based markup or when serializing/deserializing UI definitions). It registers your function in a global registry and returns a string reference key that can be used to look up and call the function later.
-
----
-
-## Signature
+`useFunctionRegistry` lets you **register a Lua function** in a global registry and returns a **string key reference**.  
+This reference can be used inside component markup (e.g. `on_press = ref`) to invoke the function later through the ascii-ui runtime.
 
 ```lua
-local ref = useFunctionRegistry(fn)
+local ref = ui.hooks.useFunctionRegistry(fn)
 ```
 
-- `fn` (*function*): The Lua function you want to register.
+## Reference
 
----
+### `useFunctionRegistry(fn)`
 
-## Parameters
+Call `useFunctionRegistry` at the top level of a component to register a **Lua function** globally and obtain a **string reference** for it.
 
-| Name | Type     | Description                      |
-|------|----------|----------------------------------|
-| fn   | function | The function to be registered.   |
+This is useful when you need to attach callbacks (like `on_press`) to UI components that are rendered as markup or resolved later by the runtime.
 
----
+```lua
+local ref = ui.hooks.useFunctionRegistry(function()
+  print("Button pressed!")
+end)
+```
 
-## Return Value
+You can then pass the returned ref string to a component prop:
 
-| Name | Type   | Description                                                |
-|------|--------|------------------------------------------------------------|
-| ref  | string | A unique string reference to the registered function.      |
+```lua
+ui.components.Button({ label = "Click Me", on_press = ref })
+```
 
-- This reference can be passed as a prop (e.g., as an event handler in markup).
-- The reference can be resolved by the ascii-ui runtime to call the function.
+### Parameters
+
+| Name | Type | Description |
+|------|------|--------------|
+| `fn` | `function` | The Lua function to register in the **global function registry**. This function can later be invoked indirectly through its string reference. |
+
+### Returns
+
+`useFunctionRegistry` returns a **string reference** to the registered function.
+
+| Name | Type | Description |
+|------|------|--------------|
+| `reference` | `string` | A unique string key that identifies the registered function. You can pass this key to UI component props (e.g. `on_press = reference`) so the ascii-ui runtime can invoke the original function later. |
 
 ---
 
 ## Usage
 
-### Example using with XML Markup
+### Example: Registering a Callback for XML Components
 
-When rendering UI with XML-like syntax, use the reference string as an event handler:
+When rendering **XML-based components** or markup strings, you can’t pass a Lua function directly.  
+Instead, use `useFunctionRegistry` to register the function globally and pass a **string reference**.
 
 ```lua
 local ui = require("ascii-ui")
-local useState = ui.hooks.useState
 local useFunctionRegistry = ui.hooks.useFunctionRegistry
 
-local function App()
-  local message, setMessage = useState("Hello World")
-  local ref = useFunctionRegistry(function()
-    setMessage("Button Pressed!")
+local MyComponent = ui.createComponent("MyComponent", function()
+  local onPressRef = useFunctionRegistry(function()
+    print("Button pressed!")
   end)
 
-  return function()
-    return ([[
+  return ([[
+    <Button label="Press Me" on_press="%s" />
+  ]]):format(onPressRef)
+end)
 
-      <Layout>
-        <Paragraph content="%s" />
-        <Button label="Press me" on_press="%s" />
-      </Layout>
-
-    ]]):format(message(), ref)
-  end
-end
-
-ui.mount(App())
+return MyComponent
 ```
 
-- The `on_press` attribute receives the function reference as a string, and the UI system looks it up and calls it when the button is pressed.
-
----
-
-## Best Practices
-
-- Use `useFunctionRegistry` when you need to reference a function in markup or when passing callbacks indirectly.
-- Avoid using it for standard in-code callbacks—prefer direct function references when possible.
-- Clean up any registered functions if your application creates/destroys many dynamic callbacks to avoid memory leaks.
-
----
-
-## Related
-
-- [`useState`](./use_state.md): For managing local component state.
-- [`useEffect`](./use_effect.md): For running side effects after rendering.
-
----
-
-## References
-
-- [ascii-ui.nvim source: use_function_registry.lua](https://github.com/rcasia/ascii-ui.nvim/blob/main/lua/ascii-ui/hooks/use_function_registry.lua)
-- [ascii-ui.nvim README](https://github.com/rcasia/ascii-ui.nvim#readme)
-
----
+Each time the user interacts with the XML-rendered button,
+the ascii-ui runtime uses the string key (onPressRef) to look up and call the registered function.
