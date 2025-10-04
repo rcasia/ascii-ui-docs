@@ -1,124 +1,115 @@
 ---
-
 sidebar_position: 2
+id: use-effect
+title: useEffect
 sidebar_label: useEffect
+description: Run side effects inside ascii-ui components.
+tags: [api, hooks, effect]
 ---
 
-# `useEffect` Hook
+# useEffect
 
-The `useEffect` hook in **ascii-ui.nvim** is a mechanism for running side effects in your functional components. Inspired by [React’s `useEffect`](https://react.dev/reference/react/useEffect), it allows you to perform operations such as logging, subscriptions, or updating external resources in response to state changes or component rendering.
-
----
-
-## Overview
-
-`useEffect` lets you run a function (“effect”) after your component is rendered, or whenever certain state values change. This is essential for:
-
-- Performing side effects after rendering (e.g., logging, updating external state)
-- Subscribing and unsubscribing to events
-- Reacting to changes in specific state variables
-
-The effect function runs once after the initial render. If you specify observed values (“dependencies”), the function will re-run whenever any of those values change.
-
----
-
-## Signature
+`useEffect` lets you run a **side effect** after a component renders, and when specific observed values change.
 
 ```lua
-useEffect(effectFn [, observedValues])
+ui.hooks.useEffect(effect_fn, dependencies)
 ```
 
-- `effectFn` (*function*): The function to run as a side effect.
-- `observedValues` (*table of getter functions*, optional): State getter functions to watch. The effect runs again if any of these values change.
+## Reference
 
----
+### `useEffect(effect_fn, dependencies?)`
 
-## Parameters
+Call `useEffect` at the top level of a component to perform side effects like logging, timers, or subscriptions.
 
-| Name           | Type                    | Description                                                                |
-|----------------|-------------------------|----------------------------------------------------------------------------|
-| effectFn       | function                | The side-effect callback function to execute.                              |
-| observedValues | table of functions (optional) | List of state getter functions to observe for changes.              |
+If you provide **dependencies**, the effect will re-run only when those values change.  
+If you omit them, the effect runs after **every render**.
+
+```lua
+ui.hooks.useEffect(function()
+  -- side effect
+  return function()
+    -- optional cleanup
+  end
+end, { dep1, dep2 })
+```
+
+### Parameters
+
+| Name | Type | Description |
+|------|------|--------------|
+| `effect_fn` | `fun(): (fun() \| nil)` | The callback function to run as a side effect. It executes after the component renders. Optionally, it can return a **cleanup function** that runs before the next effect or when the component unmounts. |
+| `dependencies?` | `any[]` | *(Optional)* A table of **observed values**. The effect re-runs only when one of these values changes. If omitted, the effect runs after **every render**. If you pass an empty table `{}`, it runs only **once on mount**. |
+
+### Returns
+
+`useEffect` does not return a value.
+
+Its purpose is to register a **side effect** and manage **cleanup logic** tied to the component’s lifecycle.  
+If the `effect_fn` returns a function, that function will be called as a **cleanup** before the next effect runs or when the component unmounts.
 
 ---
 
 ## Usage
 
-### Basic Example
+### Example: Run When Value Changes
 
-Run a function after the component renders:
+Provide dependencies so the effect runs **only** when they change:
 
 ```lua
-local ui = require("ascii-ui")
-local useEffect = ui.hooks.useEffect
-
 useEffect(function()
-  print("Component mounted or rendered!")
-end)
+  print("Count changed to", count)
+end, { count })
 ```
 
-### Watching State
+### Example: Run on Every Render
 
-Run a function only when certain state changes:
+Call `useEffect` without dependencies to run the effect after **every render**:
 
 ```lua
 local ui = require("ascii-ui")
-local useEffect = ui.hooks.useEffect
 local useState = ui.hooks.useState
+local useEffect = ui.hooks.useEffect
+local Paragraph = ui.components.Paragraph
+local Button = ui.components.Button
 
-local name, setName = useState("ascii-ui")
+local MyComponent = ui.createComponent("MyComponent", function()
+  local count, setCount = useState(0)
 
-useEffect(function()
-  print("Name changed to: " .. name())
-end, { name })
+  useEffect(function()
+    print("Rendered!")
+  end)
+
+  return {
+    Paragraph({ content = "Count: " .. count }),
+    Button({
+      label = "Increment",
+      on_press = function() setCount(count + 1) end,
+    }),
+  }
+end)
+
+return MyComponent
 ```
 
-- The effect prints a message only when `name` changes (including the first render).
+Every time the component re-renders, the effect runs again.
 
-### Multiple Dependencies
+### Example: Cleanup Function
 
-You can observe multiple state getters:
+Return a function from the effect to clean up resources when the component unmounts or before the next run:
 
 ```lua
 useEffect(function()
-  print("Either count or name changed!")
-end, { count, name })
+  local timer = vim.loop.new_timer()
+  timer:start(1000, 1000, function()
+    print("Tick!")
+  end)
+
+  return function()
+    timer:stop()
+    timer:close()
+    print("Timer stopped")
+  end
+end, {})
 ```
 
----
-
-## Comparison with React's `useEffect`
-
-| Feature                 | ascii-ui.nvim                                     | React                                      |
-|-------------------------|---------------------------------------------------|---------------------------------------------|
-| Invocation              | `useEffect(fn, {dep1, dep2})`                    | `useEffect(fn, [dep1, dep2])`              |
-| Observed values         | Table of getter functions                         | Array of variables/values                  |
-| Initial run             | Always runs after first render                    | Always runs after first render              |
-| Re-run on change        | Yes, when any observed getter returns a new value | Yes, when any dependency value changes      |
-| Cleanup support         | Not built-in                                      | Return function from effectFn for cleanup   |
-
----
-
-## Best Practices
-
-- Pass only the getter functions you want to observe in the dependency table.
-- Avoid causing side effects that update the observed state in a way that causes infinite loops.
-- Use a single `useEffect` for related logic; use multiple for unrelated effects.
-- If you want to run an effect only once (on mount), omit the dependency table.
-
----
-
-## Related
-
-- [`useState`](./use_state.md): For managing local state.
-- [`useReducer`](./use_reducer.md): For more complex state updates.
-
----
-
-## References
-
-- [ascii-ui.nvim source: use_effect.lua](https://github.com/rcasia/ascii-ui.nvim/blob/main/lua/ascii-ui/hooks/use_effect.lua)
-- [React documentation: useEffect](https://react.dev/reference/react/useEffect)
-- [ascii-ui.nvim README](https://github.com/rcasia/ascii-ui.nvim#readme)
-
----
+This cleanup function is useful for timers, subscriptions, or event listeners, ensuring they are properly released when the component unmounts.
