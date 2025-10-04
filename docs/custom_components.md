@@ -2,9 +2,7 @@
 sidebar_position: 2
 ---
 
-# Create a Custom Component
-
-## Intro
+# Custom Components
 
 The core principle of building an application with ascii-ui.nvim is defining
 custom components. A custom component is essentially a Lua function that
