@@ -1,5 +1,4 @@
 ---
-sidebar_position: 7
 id: use-timeout
 title: useTimeout
 sidebar_label: useTimeout

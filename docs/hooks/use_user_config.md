@@ -1,5 +1,4 @@
 ---
-sidebar_position: 5
 id: use-user-config
 title: useUserConfig
 sidebar_label: useUserConfig
@@ -66,5 +65,3 @@ end)
 
 return CharacterInfo
 ```
-
-

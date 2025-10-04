@@ -1,5 +1,4 @@
 ---
-sidebar_position: 4
 id: use-function-registry
 title: useFunctionRegistry [experimental]
 sidebar_label: useFunctionRegistry [experimental]

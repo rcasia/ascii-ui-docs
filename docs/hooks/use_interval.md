@@ -1,5 +1,4 @@
 ---
-sidebar_position: 6
 id: use-interval
 title: useInterval
 sidebar_label: useInterval

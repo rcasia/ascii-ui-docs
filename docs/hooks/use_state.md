@@ -1,6 +1,4 @@
 ---
-
-sidebar_position: 1
 id: use-state
 title: useState
 sidebar_label: useState

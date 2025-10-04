@@ -1,5 +1,4 @@
 ---
-sidebar_position: 2
 id: use-effect
 title: useEffect
 sidebar_label: useEffect
