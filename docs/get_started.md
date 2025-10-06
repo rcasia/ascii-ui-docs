@@ -9,11 +9,16 @@ tags: [getting-started, setup, installation, hello-world]
 
 # 🚀 Get Started
 
-Welcome to **ascii-ui.nvim** — a Lua framework for building **reactive ASCII user interfaces** directly inside Neovim buffers.
+Welcome to **ascii-ui.nvim** — a Lua framework for building **reactive ASCII
+user interfaces** directly inside Neovim buffers.
 
 These docs are still a work in progress, but you can already start creating components today 💡
 
 ---
+
+## 📋 Requirements
+
+- Neovim 0.11+
 
 ## 📦 Installation
 
