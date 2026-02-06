@@ -71,21 +71,33 @@ local useEffect = ui.hooks.useEffect
 local Paragraph = ui.components.Paragraph
 local Button = ui.components.Button
 
+--- @return string
+local current_time = function()
+	return tostring(os.date("%H:%M:%S"))
+end
+
 local MyComponent = ui.createComponent("MyComponent", function()
-  local count, setCount = useState(0)
+	local count, setCount = useState(0)
 
-  useEffect(function()
-    print("Rendered!")
-  end)
+	useEffect(function()
+		print("Rendered at " .. current_time())
 
-  return {
-    Paragraph({ content = "Count: " .. count }),
-    Button({
-      label = "Increment",
-      on_press = function() setCount(count + 1) end,
-    }),
-  }
+		return function()
+			print("Deleted at " .. current_time())
+		end
+	end)
+
+	return {
+		Paragraph({ content = "Count: " .. count }),
+		Button({
+			label = "Increment",
+			on_press = function()
+				setCount(count + 1)
+			end,
+		}),
+	}
 end)
+
 
 return MyComponent
 ```
