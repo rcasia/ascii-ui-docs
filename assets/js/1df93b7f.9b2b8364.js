@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkascii_ui=self.webpackChunkascii_ui||[]).push([[4583],{6866:(s,e,t)=>{t.r(e),t.d(e,{default:()=>a});var u=t(6347),i=t(4848);function a(){return(0,i.jsx)(u.rd,{to:"/docs/get-started"})}}}]);
