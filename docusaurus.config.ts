@@ -13,7 +13,7 @@ const config: Config = {
   url: 'https://rcasia.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: process.env.DEV_BASE_URL || '/ascii-ui-docs/',
+  baseUrl: process.env.NODE_ENV === 'development' ? '/' : (process.env.DEV_BASE_URL || '/ascii-ui-docs/'),
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
