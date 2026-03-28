@@ -71,7 +71,7 @@ When `ui.mount` is called, the fiber performs a **depth-first work loop**:
 
 When state changes (a `useState` setter is called), the framework:
 
-1. Emits a `state_change` event.
+1. Emits a `state_change` event on the **per-mount** event bus (each `ui.mount` call has its own isolated bus — concurrent mounts never interfere with each other).
 2. Runs the work loop again from the root (`rerender`).
 3. Runs any pending `useEffect` cleanups, then re-runs effects.
 4. Calls `viewport:update(buffer)` with the new buffer.
@@ -219,7 +219,7 @@ ui.mount(App)
     │
     │  [window closed]
     │
-    └─ 9. viewport:close() + useEffect cleanups + EventListener cleared
+    └─ 9. viewport:close() + useEffect cleanups + EventBus cleared
 ```
 
 ---

@@ -51,6 +51,6 @@ Move the cursor onto the input text using `h`/`j`/`k`/`l`. The buffer will becom
 ## Notes
 
 - `Input` is not part of the default `ui.components` public API. Import it with `require("ascii-ui.components.input")`.
-- The component uses `ON_INPUT` interaction internally. When the cursor moves onto an `Input` segment, the Neovim buffer's `modifiable` option is enabled; moving off it disables it again.
+- The component uses the `INPUT` interaction type internally. When the cursor moves onto an `Input` segment, the Neovim buffer's `modifiable` option is enabled; moving off it disables it again.
 - `Input` does not call any callback when the text changes. To react to input changes, read the buffer contents using Neovim API after the user interacts.
 - This component is most useful for simple single-line text fields where the full Neovim editing experience is desired.

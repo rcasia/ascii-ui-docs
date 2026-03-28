@@ -245,6 +245,27 @@ A component's render function may return:
 
 ---
 
+---
+
+## Error Reporting
+
+When a component throws an error during rendering, ascii-ui reports the full
+**component path** and the original error message, making it easy to identify
+exactly which component in a nested tree caused the failure.
+
+```
+component error [App > Counter > Button]: attempt to index a nil value (local 'props')
+```
+
+The path reflects the nesting depth at the time of the error. This also applies
+to errors thrown inside `useEffect` callbacks and interaction callbacks — the
+component name and (for interactions) the interaction type are included in the
+error message.
+
+No special configuration is needed; error reporting is always active.
+
+---
+
 ## See Also
 
 - [Built-in Components](./components/button.md) — Button, Paragraph, Select, Slider, and more

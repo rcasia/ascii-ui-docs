@@ -31,7 +31,7 @@ local seg = ui.blocks.Segment({
   color        = { fg = "#ff0000", bg = "#001122" },  -- optional hex colors
   is_focusable = true,            -- optional, make the segment focusable
   interactions = {                -- optional interaction callbacks
-    SELECT = function() print("selected") end,
+    HOVER = function() print("hovered") end,
   },
 })
 ```
@@ -48,14 +48,30 @@ local seg = ui.blocks.Segment({
 
 #### Interaction types
 
-| Key | Triggered by |
-|-----|-------------|
-| `SELECT` | `<CR>` on the focused segment |
-| `on_cursor_move_right` | `l` key |
-| `on_cursor_move_left` | `h` key |
-| `cursor_move_down` | `j` key |
-| `cursor_move_up` | `k` key |
-| `ON_INPUT` | Enables buffer editing when focused (used by `Input`) |
+All interaction type keys use `UPPER_SNAKE_CASE` and are available as constants from `require("ascii-ui.interaction_type")`.
+
+| Key | Constant | Triggered by |
+|-----|----------|-------------|
+| `"HOVER"` | `interaction_type.HOVER` | Cursor moves onto the segment |
+| `"CURSOR_MOVE_RIGHT"` | `interaction_type.CURSOR_MOVE_RIGHT` | `l` key |
+| `"CURSOR_MOVE_LEFT"` | `interaction_type.CURSOR_MOVE_LEFT` | `h` key |
+| `"CURSOR_MOVE_DOWN"` | `interaction_type.CURSOR_MOVE_DOWN` | `j` key |
+| `"CURSOR_MOVE_UP"` | `interaction_type.CURSOR_MOVE_UP` | `k` key |
+| `"INPUT"` | `interaction_type.INPUT` | Enables buffer editing when focused (used by `Input`) |
+
+Using the constants is recommended over raw strings:
+
+```lua
+local interaction_type = require("ascii-ui.interaction_type")
+
+Segment({
+  content = "→",
+  interactions = {
+    [interaction_type.CURSOR_MOVE_RIGHT] = function() ... end,
+    [interaction_type.CURSOR_MOVE_LEFT]  = function() ... end,
+  },
+})
+```
 
 ---
 
@@ -101,10 +117,11 @@ ui.mount(ColorBanner)
 
 ### Interactive custom segment
 
-Create a segment with a custom `SELECT` interaction:
+Create a segment that reacts to cursor movement:
 
 ```lua
 local ui = require("ascii-ui")
+local interaction_type = require("ascii-ui.interaction_type")
 local useState = ui.hooks.useState
 local Segment    = ui.blocks.Segment
 local Bufferline = ui.blocks.Bufferline
@@ -117,7 +134,7 @@ local ClickableText = ui.createComponent("ClickableText", function()
       Segment({
         content = clicked and "[clicked!]" or "[click me]",
         interactions = {
-          SELECT = function() setClicked(true) end,
+          [interaction_type.CURSOR_MOVE_RIGHT] = function() setClicked(true) end,
         },
       })
     ),
