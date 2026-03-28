@@ -79,3 +79,15 @@ Now that you've built your first app, explore the rest of the framework:
 - [ui.mount](./mount) — learn about viewports and the full mount lifecycle
 - [Configuration](./configuration) — customize characters, keymaps, and log level
 
+---
+
+## AI Agent Skill
+
+Use ascii-ui.nvim with AI coding agents (OpenCode, Claude, etc.) by installing the official agent skill:
+
+```sh
+npx skills add rcasia/agent-skills --skill ascii-ui-nvim
+```
+
+The skill gives agents a mental model of the component system, hooks, and common patterns so they can generate correct ascii-ui code without hallucinating APIs. Source: [rcasia/agent-skills](https://github.com/rcasia/agent-skills).
+
