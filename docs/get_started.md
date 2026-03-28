@@ -73,7 +73,7 @@ This is your first ascii-ui Neovim app — from here, you can add components, ma
 
 Now that you've built your first app, explore the rest of the framework:
 
-- [Custom Components](./custom_components) — learn how to define and compose your own components
+- [Custom Components](./custom_components.md) — learn how to define and compose your own components
 - [Components](./components/button.md) — browse all built-in components (Button, Paragraph, Select, Slider, and more)
 - [Hooks](./hooks) — manage state, side effects, timers, and configuration
 - [ui.mount](./mount) — learn about viewports and the full mount lifecycle
