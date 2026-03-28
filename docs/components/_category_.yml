@@ -1,0 +1,6 @@
+position: 2.5
+label: Components
+link:
+  type: generated-index
+  title: Components
+  description: Built-in UI components provided by ascii-ui.nvim.
