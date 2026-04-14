@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkascii_ui=self.webpackChunkascii_ui||[]).push([[5422],{1804:a=>{a.exports=JSON.parse('{"metadata":{"permalink":"/ascii-ui-docs/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":0,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
