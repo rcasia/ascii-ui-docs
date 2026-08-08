@@ -306,8 +306,7 @@ ui.mount(App, StdoutViewport.new())
 
 ## Colored Output with StdoutViewport
 
-Segments accept a `color` table with `fg` and `bg` hex color strings. This
-works both in Neovim windows (via extmarks) and in stdout (via ANSI truecolor).
+Segments accept colors in multiple formats: a table `{ fg, bg }`, a string shorthand `"#rrggbb"`, or a `ui.Color` instance. This works both in Neovim windows (via extmarks) and in stdout (via ANSI truecolor).
 
 ```lua
 local Bufferline = require("ascii-ui.buffer.bufferline")
@@ -315,14 +314,19 @@ local Segment    = require("ascii-ui.buffer.segment")
 local ui         = require("ascii-ui")
 local StdoutViewport = ui.viewports.StdoutViewport
 
+-- Define colors using ui.Color (cached and reusable)
+local RED   = ui.Color.new("#ff4466")
+local GREEN = ui.Color.new("#44ff88")
+local BLUE  = ui.Color.new({ fg = "#00ccff", bg = "#111111" })
+
 local App = ui.createComponent("App", function()
     return {
         Bufferline.new(
-            Segment:new({ content = "Red",   color = { fg = "#ff4466" } }),
+            Segment:new({ content = "Red",   color = RED }),
             Segment:new({ content = " | " }),
-            Segment:new({ content = "Green", color = { fg = "#44ff88" } }),
+            Segment:new({ content = "Green", color = GREEN }),
             Segment:new({ content = " | " }),
-            Segment:new({ content = "Blue",  color = { fg = "#00ccff" } })
+            Segment:new({ content = "Blue",  color = BLUE })
         ),
     }
 end)
@@ -330,7 +334,13 @@ end)
 ui.mount(App, StdoutViewport.new())
 ```
 
-**Key patterns:** `Segment` color object `{ fg, bg }`, multi-segment `BufferLine`.
+You can also use string shorthand directly:
+
+```lua
+Segment:new({ content = "Red", color = "#ff4466" })
+```
+
+**Key patterns:** `ui.Color` for reusable colors, string shorthand, multi-segment `BufferLine`.
 
 ---
 
