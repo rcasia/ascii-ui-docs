@@ -1,0 +1,5 @@
+label: 'Testing'
+position: 8
+link:
+  type: generated-index
+  description: Test your ascii-ui components with the built-in testing library.
