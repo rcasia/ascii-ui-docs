@@ -21,16 +21,20 @@ existing primitives (like Button and Paragraph) and manage local state.
 Use `ui.createComponent` to register a named component:
 
 ```lua
--- Signature
+-- Basic signatures
 ui.createComponent(name, render_fn)
 ui.createComponent(name, render_fn, prop_types)
+
+-- Extended signature with layout metadata
+ui.createComponent(name, render_fn, { props = prop_types, layout = layout_opts })
 ```
 
-| Parameter    | Type     | Description |
+| Parameter | Type | Description |
 |--------------|----------|-------------|
-| `name`       | `string` | Unique identifier used internally by the reconciler. |
-| `render_fn`  | `function` | The render function — called on every render cycle. Returns a node or a table of nodes. |
+| `name` | `string` | Unique identifier used internally by the reconciler. |
+| `render_fn` | `function` | The render function — called on every render cycle. Returns a node or a table of nodes. |
 | `prop_types` | `table?` | Optional map of prop name → expected Lua type. Used for runtime validation. |
+| `layout` | `table?` | Optional layout metadata (e.g., `{ direction = "row" }`). Used by the layout engine for custom layout components. |
 
 ### Simple Counter Example
 
@@ -228,6 +232,44 @@ ui.mount(App)
 
 Each `Counter` instance manages its own independent state — composing
 components is the primary way to build larger, modular UIs.
+
+---
+
+## Creating Layout Components
+
+Advanced users can create custom layout components by passing a `layout` field in the options table. The layout engine uses this metadata to position child components:
+
+```lua
+local ui = require("ascii-ui")
+local FiberNode = require("ascii-ui.fibernode")
+
+local MyLayout = ui.createComponent("MyLayout", function(props)
+  local children = props.children or {}
+  
+  -- Create a layout node with custom direction
+  local node = FiberNode.new({
+    type = "MyLayout",
+    props = props,
+    layout = { direction = "row" },  -- or "column"
+    closure = function()
+      return children
+    end,
+  })
+  
+  return { node }
+end, {
+  props = {
+    children = "table",
+  },
+  layout = { direction = "row" },
+})
+```
+
+The layout engine performs two passes:
+1. **Measure**: Calculate dimensions of each node based on content
+2. **Arrange**: Position nodes within their parent's bounds
+
+Built-in layout components like [Row](./components/row.md) and [Column](./components/column.md) use this mechanism.
 
 ---
 

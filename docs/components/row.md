@@ -9,56 +9,60 @@ tags: [components, layout]
 
 # Row
 
-`Row` is a layout component that places two or more components side by side horizontally. It merges their rendered lines column by column, aligning shorter components with blank lines to match the height of the tallest one.
+`Row` is a layout component that arranges child components horizontally, from left to right. Children are separated by a configurable gap.
 
 ```lua
-ui.layout.Row(
-  ComponentA(...),
-  ComponentB(...)
-)
+local Row = ui.layout.Row
 ```
 
 ---
 
 ## Reference
 
-### Signature
+### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `children` | `FiberNode[]` | Yes | Child components to arrange horizontally. |
+| `gap` | `integer` | No | Space between children in characters. Defaults to `1`. |
+
+### Signatures
+
+`Row` supports two calling conventions:
 
 ```lua
-ui.layout.Row(...components) -> FiberNode
-```
+-- Props table (preferred)
+Row({ children = { child1, child2 }, gap = 2 })
 
-`Row` accepts any number of component fiber nodes as arguments and returns a single fiber node representing the horizontal layout.
+-- Varargs (legacy)
+Row(child1, child2, child3)
+```
 
 ---
 
 ## Usage
 
-### Two components side by side
+### Basic layout
 
 ```lua
 local ui = require("ascii-ui")
 local Row = ui.layout.Row
 local Paragraph = ui.components.Paragraph
-local Button = ui.components.Button
 
 local Layout = ui.createComponent("Layout", function()
-  return {
-    Row(
-      Paragraph({ content = "Left column\nSecond line" }),
-      Paragraph({ content = "Right column" })
-    ),
-  }
+  return Row(
+    Paragraph({ content = "Left" }),
+    Paragraph({ content = "Right" })
+  )
 end)
 
 ui.mount(Layout)
 ```
 
-This renders:
+Output:
 
 ```
-Left column  Right column
-Second line
+Left Right
 ```
 
 ### Dashboard with boxes
@@ -69,34 +73,88 @@ local Row = ui.layout.Row
 local Box = require("ascii-ui.components.box")
 
 local Dashboard = ui.createComponent("Dashboard", function()
-  return {
-    Row(
-      Box({ width = 14, height = 3, content = "CPU 42%" }),
-      Box({ width = 14, height = 3, content = "MEM 68%" }),
-      Box({ width = 14, height = 3, content = "DISK 55%" })
-    ),
-  }
+  return Row(
+    Box({ width = 14, height = 3, content = "CPU 42%" }),
+    Box({ width = 14, height = 3, content = "MEM 68%" }),
+    Box({ width = 14, height = 3, content = "DISK 55%" })
+  )
 end)
 
 ui.mount(Dashboard)
 ```
 
-### Three columns
+### Custom gap
 
-`Row` accepts any number of arguments:
+Use the props table form to set a custom gap between children:
 
 ```lua
-Row(
-  Paragraph({ content = "Column 1" }),
-  Paragraph({ content = "Column 2" }),
-  Paragraph({ content = "Column 3" })
-)
+local Row = ui.layout.Row
+local Paragraph = ui.components.Paragraph
+
+Row({
+  children = {
+    Paragraph({ content = "A" }),
+    Paragraph({ content = "B" }),
+    Paragraph({ content = "C" }),
+  },
+  gap = 3,
+})
+```
+
+Output:
+
+```
+A   B   C
+```
+
+### Dynamic children
+
+```lua
+local ui = require("ascii-ui")
+local Row = ui.layout.Row
+local Paragraph = ui.components.Paragraph
+local useState = ui.hooks.useState
+
+local DynamicRow = ui.createComponent("DynamicRow", function()
+  local items, setItems = useState({ "X" })
+
+  local children = {}
+  for _, item in ipairs(items) do
+    children[#children + 1] = Paragraph({ content = item })
+  end
+
+  return Row({ children = children })
+end)
+```
+
+---
+
+## Nesting
+
+`Row` and [Column](./column.md) can be nested to create complex layouts:
+
+```lua
+local ui = require("ascii-ui")
+local Row = ui.layout.Row
+local Column = ui.layout.Column
+local Paragraph = ui.components.Paragraph
+
+local App = ui.createComponent("App", function()
+  return Column(
+    Paragraph({ content = "Header" }),
+    Row(
+      Paragraph({ content = "Left" }),
+      Paragraph({ content = "Right" })
+    ),
+    Paragraph({ content = "Footer" })
+  )
+end)
 ```
 
 ---
 
 ## Notes
 
-- `Row` is available as `ui.layout.Row` (accessible via `require("ascii-ui").layout.Row`).
-- Columns are separated by a single space. The left column is padded to its maximum line width before the next column begins.
-- If columns have different heights, shorter columns are padded with blank lines to match the tallest.
+- Available as `ui.layout.Row`.
+- Children with different heights are padded with blank lines to match the tallest.
+- For vertical layouts, see [Column](./column.md).

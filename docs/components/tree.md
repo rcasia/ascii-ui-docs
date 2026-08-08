@@ -41,9 +41,11 @@ require("ascii-ui.components.tree")({
 ```lua
 ---@class TreeNode
 ---@field text string          The label displayed for this node.
----@field children? TreeNode[] Child nodes. If absent or empty, this is a leaf.
+---@field children? (TreeNode|FiberNode)[]  Child nodes or components. If absent or empty, this is a leaf.
 ---@field expanded? boolean    Whether this node starts expanded. Defaults to true.
 ```
+
+Children can be either `TreeNode` objects (for nested tree structure) or component nodes like `FiberNode` or `BufferLine` (for embedding custom components in the tree).
 
 ---
 
@@ -106,6 +108,27 @@ Tree({
 ```
 
 The node will show `▸ vendor/` and its children will be hidden until the user expands it.
+
+### Embedding components
+
+Tree children can be component nodes (`FiberNode` or `BufferLine`) instead of `TreeNode` objects. This allows embedding custom content within the tree:
+
+```lua
+local ui = require("ascii-ui")
+local Tree = require("ascii-ui.components.tree")
+local Paragraph = ui.components.Paragraph
+
+Tree({
+  tree = {
+    text = "Project",
+    children = {
+      { text = "README.md" },
+      Paragraph({ content = "Custom content here" }),
+      { text = "src/" },
+    },
+  },
+})
+```
 
 ---
 
