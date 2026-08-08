@@ -87,6 +87,52 @@ ui.mount(MyApp, ui.viewports.StdoutViewport.new())
 
 ---
 
+## Error Handling
+
+When a component throws an error during render, ascii-ui catches it and displays a formatted error message in the viewport instead of crashing silently.
+
+### Render Errors
+
+If your component throws during the initial render or a re-render, you'll see an error screen:
+
+```
+═══ RENDER ERROR ═══
+
+Type: render
+Component: MyApp > Counter
+Message: attempt to index local 'state' (a nil value)
+
+Hint: Components must return a list (table) of FiberNode or BufferLine objects.
+      Did you forget to wrap your return value?
+      
+      Example:
+        return { Segment:new({ content = "hello" }):wrap() }
+
+═══════════════════
+```
+
+### Error Types
+
+ascii-ui categorizes errors by type:
+
+| Type | Description |
+|------|-------------|
+| `render` | Error during component render |
+| `hook` | Error in a hook (useState, useEffect, etc.) |
+| `effect` | Error in an effect or cleanup function |
+| `interaction` | Error in user interaction handler |
+| `viewport` | Error in viewport operations |
+
+Each error type includes a contextual hint to help you debug the issue.
+
+### Error Recovery
+
+After a render error, the viewport remains open showing the error message. Fix the issue in your component code, and the error will disappear on the next successful render.
+
+See [Error Handling](./error-handling.md) for more details on debugging and common error patterns.
+
+---
+
 ## Default keyboard bindings
 
 These bindings are active while the ascii-ui window is focused:

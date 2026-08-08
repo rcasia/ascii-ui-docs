@@ -224,6 +224,21 @@ ui.mount(App)
 
 ---
 
+## 7. Error Handling
+
+When a component throws during render, ascii-ui catches the error and displays a formatted error message in the viewport instead of crashing. The error includes:
+
+- **Error type** (render, hook, effect, interaction, viewport)
+- **Component path** (e.g., `App > Counter > Display`)
+- **Error message**
+- **Contextual hint** for debugging
+
+The viewport remains open, allowing you to fix the issue and see the error disappear on the next successful render.
+
+See [Error Handling](./error-handling.md) for details on error types and debugging.
+
+---
+
 ## See Also
 
 - [Custom Components](./custom_components.md) — how to write render functions and compose components
