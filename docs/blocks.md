@@ -152,6 +152,81 @@ Checks if an object is a Color instance.
 assert.is_true(ui.Color.is_color(red))
 ```
 
+### HSL Color Support
+
+The Color API also supports HSL (Hue, Saturation, Lightness) color manipulation.
+
+#### `ui.Color.from_hsl(h, s, l)`
+
+Creates a Color from HSL values. Hue is 0-360, saturation and lightness are 0-100. Values are clamped to valid ranges.
+
+```lua
+-- Create a color from HSL values
+local blue = ui.Color.from_hsl(240, 100, 50)
+
+-- Create a pastel red
+local pastel_red = ui.Color.from_hsl(0, 50, 75)
+```
+
+#### `color:to_hsl()`
+
+Returns the HSL representation of the color's foreground. Returns `nil` for all three values if fg is not set.
+
+```lua
+local color = ui.Color.new("#ff0000")
+local h, s, l = color:to_hsl()
+-- h = 0, s = 100, l = 50
+```
+
+#### Color Manipulation Methods
+
+All manipulation methods return new Color instances (immutable). Values are clamped to valid ranges.
+
+##### `color:lighten(amount)`
+
+Returns a new Color with lightness increased by the given amount (0-100).
+
+```lua
+local base = ui.Color.new("#ff0000")
+local lighter = base:lighten(20)
+```
+
+##### `color:darken(amount)`
+
+Returns a new Color with lightness decreased by the given amount (0-100).
+
+```lua
+local base = ui.Color.new("#ff0000")
+local darker = base:darken(20)
+```
+
+##### `color:saturate(amount)`
+
+Returns a new Color with saturation increased by the given amount (0-100).
+
+```lua
+local base = ui.Color.new("#ff6666")
+local more_saturated = base:saturate(30)
+```
+
+##### `color:desaturate(amount)`
+
+Returns a new Color with saturation decreased by the given amount (0-100).
+
+```lua
+local base = ui.Color.new("#ff0000")
+local muted = base:desaturate(50)
+```
+
+##### `color:complement()`
+
+Returns the complement color (hue rotated 180 degrees).
+
+```lua
+local red = ui.Color.new("#ff0000")
+local cyan = red:complement()
+```
+
 ### Color Caching
 
 Colors are cached by their fg/bg combination. Creating a Color with the same values returns the same instance:
