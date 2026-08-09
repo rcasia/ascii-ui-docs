@@ -28,13 +28,13 @@ describe("MyComponent E2E", function()
         local screen = testing_e2e.mount(App)
 
         -- Wait for initial render
-        assert.is_true(screen:waitForText("[x] a"))
+        assert(screen:waitForText("[x] a"))
 
         -- Simulate keypress
         screen:press("j")
 
         -- Assert cursor moved
-        assert.is_true(screen:cursorIsAt(2))
+        assert(screen:cursorIsAt(2))
     end)
 end)
 ```
@@ -54,7 +54,7 @@ The `mount()` function opens a real Neovim window and returns an `E2EScreen` obj
 Checks if the Neovim buffer contains the given text.
 
 ```lua
-assert.is_true(screen:bufferContains("hello"))
+assert(screen:bufferContains("hello"))
 ```
 
 ### `screen:waitForText(text, timeout?)`
@@ -62,7 +62,7 @@ assert.is_true(screen:bufferContains("hello"))
 Waits for text to appear in the buffer (useful for async operations).
 
 ```lua
-assert.is_true(screen:waitForText("loading...", 2000))
+assert(screen:waitForText("loading...", 2000))
 ```
 
 ### `screen:cursorIsAt(line, col?)`
@@ -70,7 +70,7 @@ assert.is_true(screen:waitForText("loading...", 2000))
 Asserts the cursor is at the given position.
 
 ```lua
-assert.is_true(screen:cursorIsAt(2, 5))
+assert(screen:cursorIsAt(2, 5))
 ```
 
 ### `screen:press(keys)`
@@ -130,9 +130,9 @@ local testing_e2e = require("ascii-ui.testing.e2e")
 describe("MyComponent", function()
     it("works", function()
         local screen = testing_e2e.mount(App)
-        assert.is_true(screen:waitForText("hello"))
+        assert(screen:waitForText("hello"))
         screen:press("j")
-        assert.is_true(screen:waitForText("world"))
+        assert(screen:waitForText("world"))
     end)
 end)
 ```

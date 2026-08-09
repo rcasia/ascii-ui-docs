@@ -141,7 +141,7 @@ Returns `true` if neither fg nor bg is set.
 
 ```lua
 local empty = ui.Color.new({})
-assert.is_true(empty:is_empty())
+assert(empty:is_empty())
 ```
 
 ##### `ui.Color.is_color(obj)`
@@ -149,7 +149,7 @@ assert.is_true(empty:is_empty())
 Checks if an object is a Color instance.
 
 ```lua
-assert.is_true(ui.Color.is_color(red))
+assert(ui.Color.is_color(red))
 ```
 
 ### HSL Color Support
@@ -234,7 +234,7 @@ Colors are cached by their fg/bg combination. Creating a Color with the same val
 ```lua
 local c1 = ui.Color.new("#ff0000")
 local c2 = ui.Color.new("#ff0000")
-assert.are.same(c1, c2)  -- same instance
+assert(c1 == c2)  -- same instance
 ```
 
 ---

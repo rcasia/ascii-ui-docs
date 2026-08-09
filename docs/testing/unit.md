@@ -27,7 +27,7 @@ describe("MyComponent", function()
         local screen = testing.render(App)
 
         -- Assert the rendered output
-        assert.is_true(screen:hasLines({
+        assert(screen:hasLines({
             "[x] apple",
             "[ ] banana",
             "[ ] cherry"
@@ -54,7 +54,7 @@ Finds a segment containing the given text.
 
 ```lua
 local segment = screen:getByText("apple")
-assert.are.same("apple", segment.content)
+assert(segment.content == "apple")
 ```
 
 ### `screen:queryByText(text)`
@@ -63,7 +63,7 @@ Like `getByText`, but returns `nil` instead of throwing an error.
 
 ```lua
 local segment = screen:queryByText("missing")
-assert.is_nil(segment)
+assert(segment == nil)
 ```
 
 ### `screen:getAllByText(text)`
@@ -72,7 +72,7 @@ Finds all segments containing the given text.
 
 ```lua
 local segments = screen:getAllByText("item")
-assert.are.same(3, #segments)
+assert(#segments == 3)
 ```
 
 ### `screen:getByHighlight(highlight)`
@@ -89,7 +89,7 @@ Returns the first focusable segment.
 
 ```lua
 local focusable = screen:getFocusable()
-assert.is_true(focusable:is_focusable())
+assert(focusable:is_focusable())
 ```
 
 ### `screen:getAllFocusable()`
@@ -98,7 +98,7 @@ Returns all focusable segments.
 
 ```lua
 local focusables = screen:getAllFocusable()
-assert.are.same(3, #focusables)
+assert(#focusables == 3)
 ```
 
 ## Assertions
@@ -110,7 +110,7 @@ Assertions check properties of the rendered buffer.
 Checks if the buffer contains the given text anywhere.
 
 ```lua
-assert.is_true(screen:hasText("hello"))
+assert(screen:hasText("hello"))
 ```
 
 ### `screen:hasLine(line)`
@@ -118,7 +118,7 @@ assert.is_true(screen:hasText("hello"))
 Checks if the buffer contains an exact line.
 
 ```lua
-assert.is_true(screen:hasLine("[x] apple"))
+assert(screen:hasLine("[x] apple"))
 ```
 
 ### `screen:hasLines(lines)`
@@ -126,7 +126,7 @@ assert.is_true(screen:hasLine("[x] apple"))
 Checks if the buffer exactly matches the given lines.
 
 ```lua
-assert.is_true(screen:hasLines({
+assert(screen:hasLines({
     "[x] apple",
     "[ ] banana"
 }))
@@ -137,7 +137,7 @@ assert.is_true(screen:hasLines({
 Checks if a focusable segment with the given text exists.
 
 ```lua
-assert.is_true(screen:hasFocusable("Submit"))
+assert(screen:hasFocusable("Submit"))
 ```
 
 ### `screen:hasHighlight(highlight)`
@@ -145,7 +145,7 @@ assert.is_true(screen:hasFocusable("Submit"))
 Checks if a segment with the given highlight exists.
 
 ```lua
-assert.is_true(screen:hasHighlight("Selection"))
+assert(screen:hasHighlight("Selection"))
 ```
 
 ## Interactions
@@ -158,7 +158,7 @@ Triggers the SELECT interaction on a segment and re-renders.
 
 ```lua
 screen:select("apple")
-assert.is_true(screen:hasLine("[x] apple"))
+assert(screen:hasLine("[x] apple"))
 ```
 
 ### `screen:trigger(text, interaction)`
