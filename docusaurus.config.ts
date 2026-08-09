@@ -21,7 +21,12 @@ const config: Config = {
   projectName: 'ascii-ui-docs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   plugins: [
     [
@@ -66,7 +71,7 @@ const config: Config = {
     navbar: {
       title: 'ascii-ui',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'ascii-ui logo',
         src: 'img/logo.png',
       },
       items: [
