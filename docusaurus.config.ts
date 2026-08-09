@@ -101,11 +101,40 @@ const config: Config = {
           ],
         },
         {
+          title: 'Repositories',
+          items: [
+            {
+              label: 'ascii-ui.nvim',
+              href: 'https://github.com/rcasia/ascii-ui.nvim',
+            },
+            {
+              label: 'ascii-ui-docs',
+              href: 'https://github.com/rcasia/ascii-ui-docs',
+            },
+            {
+              label: 'agent-skills',
+              href: 'https://github.com/rcasia/agent-skills',
+            },
+            {
+              label: 'simon-says.nvim',
+              href: 'https://github.com/rcasia/simon-says.nvim',
+            },
+            {
+              label: 'neotest-java',
+              href: 'https://github.com/rcasia/neotest-java',
+            },
+            {
+              label: 'git-mob.nvim',
+              href: 'https://github.com/rcasia/git-mob.nvim',
+            },
+          ],
+        },
+        {
           title: 'More',
           items: [
             {
-              label: 'GitHub Docs Page',
-              href: 'https://github.com/rcasia/ascii-ui-docs',
+              label: 'All Repositories',
+              href: 'https://github.com/rcasia?tab=repositories',
             },
           ],
         },
