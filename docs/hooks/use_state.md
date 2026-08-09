@@ -47,6 +47,20 @@ Every time you call setCount, the component re-renders with the updated value.
 
 ---
 
+### Nil state values
+
+`useState` correctly preserves `nil` values across re-renders. Setting state to `nil` does not re-initialize it to the initial value:
+
+```lua
+local value, setValue = ui.hooks.useState(100)
+
+setValue(nil) -- state is now nil, not 100
+```
+
+This allows you to use `nil` as a valid state value to represent "no value" or "cleared" states.
+
+---
+
 ## Usage
 
 ### Updating state

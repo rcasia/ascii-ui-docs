@@ -43,8 +43,8 @@ end, { dep1, dep2 })
 
 `useEffect` does not return a value.
 
-Its purpose is to register a **side effect** and manage **cleanup logic** tied to the component’s lifecycle.  
-If the `effect_fn` returns a function, that function will be called as a **cleanup** before the next effect runs or when the component unmounts.
+Its purpose is to register a **side effect** and manage **cleanup logic** tied to the component's lifecycle.  
+If the `effect_fn` returns a function, that function will be called as a **cleanup** before the next effect runs or when the component unmounts. Cleanup functions only run for effects that have been mounted (i.e., effects that have actually executed).
 
 ---
 

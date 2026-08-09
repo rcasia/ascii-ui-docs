@@ -1,0 +1,334 @@
+name: AI Docs Update
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  update-docs:
+    name: Update documentation with AI
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'docs-sync')
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check for existing PR
+        id: check_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          EXISTING_PR=$(gh pr list --search "Closes #$ISSUE_NUMBER" --json number --jq '.[0].number // empty')
+          
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR #$EXISTING_PR already exists for this issue, skipping"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "skip=false" >> $GITHUB_OUTPUT
+
+      - name: Parse issue and fetch upstream data
+        id: fetch
+        if: steps.check_pr.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          COMMIT_SHA=$(echo "$ISSUE_BODY" | grep -oP '\*\*Commit\*\*: \[\K[a-f0-9]+' || echo "")
+          COMMIT_MSG=$(echo "$ISSUE_BODY" | grep -oP '\*\*Message\*\*: \K.*' || echo "")
+
+          if [ -z "$COMMIT_SHA" ]; then
+            echo "Could not extract commit SHA from issue"
+            exit 1
+          fi
+
+          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+
+          git clone --depth=50 https://github.com/rcasia/ascii-ui.nvim.git /tmp/ascii-ui.nvim
+
+          cd /tmp/ascii-ui.nvim
+          git fetch origin $COMMIT_SHA
+          git show $COMMIT_SHA > /tmp/commit_diff.txt
+          cp doc/ascii-ui.txt /tmp/vimdocs.txt
+          git show --name-only $COMMIT_SHA | tail -n +7 > /tmp/changed_files.txt
+
+          echo "Fetched data for commit $COMMIT_SHA"
+
+      - name: Identify affected docs
+        id: identify
+        if: steps.check_pr.outputs.skip != 'true'
+        run: |
+          CHANGED_FILES=$(cat /tmp/changed_files.txt)
+          AFFECTED_DOCS=""
+
+          for file in $CHANGED_FILES; do
+            case "$file" in
+              *use_state*)      AFFECTED_DOCS="$AFFECTED_DOCS docs/hooks/use_state.md" ;;
+              *use_effect*)     AFFECTED_DOCS="$AFFECTED_DOCS docs/hooks/use_effect.md" ;;
+              *use_timeout*)    AFFECTED_DOCS="$AFFECTED_DOCS docs/hooks/use_timeout.md" ;;
+              *use_interval*)   AFFECTED_DOCS="$AFFECTED_DOCS docs/hooks/use_interval.md" ;;
+              *use_reducer*)    AFFECTED_DOCS="$AFFECTED_DOCS docs/hooks/use_reducer.md" ;;
+              *mount.lua*)      AFFECTED_DOCS="$AFFECTED_DOCS docs/mount.md" ;;
+              *testing/e2e*)    AFFECTED_DOCS="$AFFECTED_DOCS docs/testing/e2e.md" ;;
+              *testing/unit*)   AFFECTED_DOCS="$AFFECTED_DOCS docs/testing/unit.md" ;;
+              *blocks*|*segment*|*bufferline*) AFFECTED_DOCS="$AFFECTED_DOCS docs/blocks.md" ;;
+            esac
+          done
+
+          AFFECTED_DOCS=$(echo "$AFFECTED_DOCS" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          
+          if [ -z "$AFFECTED_DOCS" ]; then
+            echo "No docs files affected by this commit"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "affected_docs=$AFFECTED_DOCS" >> $GITHUB_OUTPUT
+          echo "skip=false" >> $GITHUB_OUTPUT
+          echo "Affected docs: $AFFECTED_DOCS"
+
+      - name: Read current docs for context
+        id: read_docs
+        if: steps.check_pr.outputs.skip != 'true' && steps.identify.outputs.skip != 'true'
+        run: |
+          AFFECTED_DOCS="${{ steps.identify.outputs.affected_docs }}"
+          CURRENT_CONTENTS=""
+
+          for doc_file in $AFFECTED_DOCS; do
+            if [ -f "$doc_file" ]; then
+              CURRENT_CONTENTS="$CURRENT_CONTENTS\n### $doc_file\n$(cat "$doc_file")\n---\n"
+            fi
+          done
+
+          echo "$CURRENT_CONTENTS" > /tmp/current_docs.txt
+
+      - name: Setup Node.js
+        if: steps.check_pr.outputs.skip != 'true' && steps.identify.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.check_pr.outputs.skip != 'true' && steps.identify.outputs.skip != 'true'
+        run: npm ci
+
+      - name: Generate updated docs with AI
+        id: ai
+        if: steps.check_pr.outputs.skip != 'true' && steps.identify.outputs.skip != 'true'
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          AI_MODEL: ${{ secrets.AI_MODEL || 'qwen3.7-plus' }}
+        run: |
+          COMMIT_DIFF=$(cat /tmp/commit_diff.txt)
+          VIMDOCS=$(cat /tmp/vimdocs.txt)
+          CURRENT_DOCS=$(cat /tmp/current_docs.txt)
+          AFFECTED_DOCS="${{ steps.identify.outputs.affected_docs }}"
+          COMMIT_MSG="${{ steps.fetch.outputs.commit_msg }}"
+
+          PROMPT="You are a technical documentation writer for a Docusaurus site documenting ascii-ui.nvim, a Neovim UI framework.
+
+## Upstream commit
+Message: $COMMIT_MSG
+
+Diff:
+\`\`\`
+$COMMIT_DIFF
+\`\`\`
+
+## Current vimdocs (authoritative API reference)
+\`\`\`
+$VIMDOCS
+\`\`\`
+
+## Current docs files
+$CURRENT_DOCS
+
+## Files to update
+$AFFECTED_DOCS
+
+## Instructions
+1. Analyze the commit diff to understand what changed
+2. Cross-reference with vimdocs for API accuracy
+3. Update only the affected markdown files
+4. Preserve existing frontmatter, structure, and style
+5. Keep Lua code examples syntactically correct and runnable
+6. Return ONLY the updated file contents in this format:
+
+FILE: <path>
+<full file content>
+---
+
+No explanations outside FILE blocks."
+
+          ESCAPED_PROMPT=$(echo "$PROMPT" | jq -Rs .)
+
+          RESPONSE=$(curl -s --max-time 300 https://opencode.ai/zen/go/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENCODE_API_KEY" \
+            -d "{
+              \"model\": \"$AI_MODEL\",
+              \"messages\": [
+                {\"role\": \"user\", \"content\": $ESCAPED_PROMPT}
+              ],
+              \"temperature\": 0.2,
+              \"max_tokens\": 8000
+            }")
+
+          AI_OUTPUT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+
+          if [ -z "$AI_OUTPUT" ] || [ "$AI_OUTPUT" = "null" ]; then
+            echo "AI API error:"
+            echo "$RESPONSE" | jq .
+            exit 1
+          fi
+
+          echo "$AI_OUTPUT" > /tmp/ai_output.txt
+          echo "AI generated documentation updates"
+
+      - name: Apply AI-generated changes
+        id: apply
+        if: steps.check_pr.outputs.skip != 'true' && steps.identify.outputs.skip != 'true'
+        run: |
+          AI_OUTPUT=$(cat /tmp/ai_output.txt)
+
+          echo "$AI_OUTPUT" | awk '
+            /^FILE: / {
+              if (filename != "") {
+                print content > filename
+                close(filename)
+              }
+              filename = substr($0, 7)
+              content = ""
+              next
+            }
+            /^---$/ {
+              if (filename != "") {
+                print content > filename
+                close(filename)
+                filename = ""
+                content = ""
+              }
+              next
+            }
+            {
+              if (filename != "") {
+                if (content != "") content = content "\n"
+                content = content $0
+              }
+            }
+          '
+
+          echo "Applied AI-generated changes"
+
+      - name: Check for actual changes
+        id: check_changes
+        if: steps.check_pr.outputs.skip != 'true' && steps.identify.outputs.skip != 'true'
+        run: |
+          if git diff --quiet docs/; then
+            echo "No changes detected after AI processing"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git diff --stat docs/
+          fi
+
+      - name: Verify build
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: npm run build
+
+      - name: Upload AI output for debugging
+        if: failure() && steps.ai.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-output-${{ github.event.issue.number }}
+          path: /tmp/ai_output.txt
+          retention-days: 7
+
+      - name: Create pull request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMIT_SHA="${{ steps.fetch.outputs.commit_sha }}"
+          COMMIT_MSG="${{ steps.fetch.outputs.commit_msg }}"
+          ISSUE_NUMBER="${{ steps.fetch.outputs.issue_number }}"
+          BRANCH_NAME="docs/update-${COMMIT_SHA}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH_NAME"
+          git add docs/
+          git commit -m "docs: update for upstream ${COMMIT_SHA}
+
+${COMMIT_MSG}
+
+Closes #${ISSUE_NUMBER}
+
+Generated with AI assistance"
+
+          git push -u origin "$BRANCH_NAME"
+
+          gh pr create \
+            --title "docs: update for upstream ${COMMIT_SHA}" \
+            --body "Automated documentation update for upstream commit [${COMMIT_SHA}](https://github.com/rcasia/ascii-ui.nvim/commit/${COMMIT_SHA}).
+
+**Commit message:** ${COMMIT_MSG}
+
+Closes #${ISSUE_NUMBER}
+
+---
+Generated by AI. Please review before merging." \
+            --label "documentation,ai-generated"
+
+      - name: Comment on issue (success)
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER="${{ steps.fetch.outputs.issue_number }}"
+          COMMIT_SHA="${{ steps.fetch.outputs.commit_sha }}"
+          gh issue comment "$ISSUE_NUMBER" --body "Documentation update PR created for commit \`${COMMIT_SHA}\`."
+
+      - name: Comment on issue (no changes)
+        if: steps.check_changes.outputs.has_changes == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER="${{ steps.fetch.outputs.issue_number }}"
+          gh issue comment "$ISSUE_NUMBER" --body "No documentation changes needed for this commit."
+          gh issue close "$ISSUE_NUMBER" --reason "completed"
+
+      - name: Comment on issue (skipped)
+        if: steps.check_pr.outputs.skip == 'true' || steps.identify.outputs.skip == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER="${{ steps.fetch.outputs.issue_number }}"
+          gh issue comment "$ISSUE_NUMBER" --body "Skipping: PR already exists or no docs files affected."
+          gh issue close "$ISSUE_NUMBER" --reason "not planned"
+
+      - name: Comment on issue (failure)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NUMBER="${{ steps.fetch.outputs.issue_number }}"
+          gh issue comment "$ISSUE_NUMBER" --body "Failed to update documentation automatically. Please review manually.
+
+Check the [workflow logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details."

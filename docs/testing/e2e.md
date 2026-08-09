@@ -35,6 +35,9 @@ describe("MyComponent E2E", function()
 
         -- Assert cursor moved
         assert(screen:cursorIsAt(2))
+
+        -- Clean up timers and close window
+        screen:unmount()
     end)
 end)
 ```
@@ -48,6 +51,16 @@ local screen = testing_e2e.mount(Component)
 The `mount()` function opens a real Neovim window and returns an `E2EScreen` object.
 
 ## E2E Methods
+
+### `screen:unmount()`
+
+Unmounts the component and closes the window. This cleans up timers and prevents leaks.
+
+```lua
+screen:unmount()
+```
+
+Call this after each test to ensure proper cleanup, especially when testing components with `useTimeout` or `useInterval`.
 
 ### `screen:bufferContains(text)`
 
@@ -133,6 +146,7 @@ describe("MyComponent", function()
         assert(screen:waitForText("hello"))
         screen:press("j")
         assert(screen:waitForText("world"))
+        screen:unmount()
     end)
 end)
 ```

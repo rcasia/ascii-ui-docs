@@ -83,7 +83,7 @@ ui.mount(MyApp, ui.viewports.StdoutViewport.new())
 3. **Update viewport** — Calls `viewport:update(buffer)` to write the rendered content.
 4. **Keyboard bindings** — Registers `vim.on_key` for `h`/`j`/`k`/`l` navigation between focusable segments.
 5. **State change listener** — On every `useState` setter call, rerenders and refreshes the viewport.
-6. **Cleanup** — On `WinClosed`, detaches all bindings, calls `viewport:close()`, and runs `useEffect` cleanups.
+6. **Cleanup** — On `WinClosed`, detaches all bindings, calls `root:unmount()` to clean up effects and timers, calls `viewport:close()`, and runs `useEffect` cleanups.
 
 ---
 

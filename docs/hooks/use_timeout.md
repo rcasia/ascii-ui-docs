@@ -9,7 +9,8 @@ tags: [api, hooks, effect, timeout, timer]
 # useTimeout
 
 `useTimeout` lets you run a **callback function once** after a specified delay (in milliseconds).  
-It automatically handles timer creation and cleanup when the component unmounts or when the delay changes.
+The callback always has access to the latest closure values via a ref pattern.  
+The timer only restarts when the delay value changes, not on every render.
 
 ```lua
 ui.hooks.useTimeout(callback, delay_ms)
@@ -70,3 +71,36 @@ local DelayedMessage = ui.createComponent("DelayedMessage", function()
 end)
 
 return DelayedMessage
+```
+
+### Example: Timer Chain with Latest State
+
+The callback always sees the latest state values, enabling timer chains:
+
+```lua
+local ui = require("ascii-ui")
+local useState = ui.hooks.useState
+local useTimeout = ui.hooks.useTimeout
+local Paragraph = ui.components.Paragraph
+
+local Counter = ui.createComponent("Counter", function()
+  local count, setCount = useState(0)
+
+  -- Timer restarts only when delay changes
+  -- Each time count changes, delay changes, so timer restarts
+  local delay = count < 3 and (1000 + count) or nil
+
+  useTimeout(function()
+    -- This callback sees the latest count value
+    if count < 3 then
+      setCount(count + 1)
+    end
+  end, delay)
+
+  return Paragraph({ content = "Count: " .. count })
+end)
+
+return Counter
+```
+
+This pattern creates a sequence of timeouts that increment the counter, with each timeout seeing the updated state from the previous one.
