@@ -10,14 +10,14 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://rcasia.github.io',
+  url: 'https://ascii-ui.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: process.env.NODE_ENV === 'development' ? '/' : (process.env.DEV_BASE_URL || '/ascii-ui-docs/'),
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'rcasia', // Usually your GitHub org/user name.
+  organizationName: 'ascii-ui', // Usually your GitHub org/user name.
   projectName: 'ascii-ui-docs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -56,7 +56,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/rcasia/ascii-ui-docs/edit/main',
+            'https://github.com/ascii-ui/ascii-ui-docs/edit/main',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -82,7 +82,7 @@ const config: Config = {
           label: 'Get started',
         },
         {
-          href: 'https://github.com/rcasia/ascii-ui.nvim',
+          href: 'https://github.com/ascii-ui/ascii-ui.nvim',
           label: 'GitHub',
           position: 'right',
         },
@@ -105,27 +105,27 @@ const config: Config = {
           items: [
             {
               label: 'ascii-ui.nvim',
-              href: 'https://github.com/rcasia/ascii-ui.nvim',
+              href: 'https://github.com/ascii-ui/ascii-ui.nvim',
             },
             {
               label: 'ascii-ui-docs',
-              href: 'https://github.com/rcasia/ascii-ui-docs',
+              href: 'https://github.com/ascii-ui/ascii-ui-docs',
             },
             {
               label: 'agent-skills',
-              href: 'https://github.com/rcasia/agent-skills',
+              href: 'https://github.com/ascii-ui/agent-skills',
             },
             {
               label: 'simon-says.nvim',
-              href: 'https://github.com/rcasia/simon-says.nvim',
+              href: 'https://github.com/ascii-ui/simon-says.nvim',
             },
             {
               label: 'neotest-java',
-              href: 'https://github.com/rcasia/neotest-java',
+              href: 'https://github.com/ascii-ui/neotest-java',
             },
             {
               label: 'git-mob.nvim',
-              href: 'https://github.com/rcasia/git-mob.nvim',
+              href: 'https://github.com/ascii-ui/git-mob.nvim',
             },
           ],
         },
@@ -134,7 +134,7 @@ const config: Config = {
           items: [
             {
               label: 'All Repositories',
-              href: 'https://github.com/rcasia?tab=repositories',
+              href: 'https://github.com/ascii-ui?tab=repositories',
             },
           ],
         },
